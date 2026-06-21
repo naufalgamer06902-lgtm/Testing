@@ -25,7 +25,7 @@ function placeFood() {
   } while (snake.some(function(s) { return s.x === food.x && s.y === food.y; }));
 }
 
-function start() {
+window.start = function start() {
   if (loopTimer) clearInterval(loopTimer);
   init();
   phase     = 'running';
