@@ -1,7 +1,6 @@
 // render.js — canvas setup and all drawing code
 // Reads globals defined in game.js: CELL, COLS, ROWS, snake, food, score, best, phase
-
-var canvas = document.getElementById('canvas');
+var canvas = document.getElementById('game');
 var ctx    = canvas.getContext('2d');
 var COLORS = {
   bg:        '#000',
