@@ -1,53 +1,31 @@
-// input.js — keyboard and touch/swipe input
-// canvas is defined in render.js (loaded before this file)
-// dir, nextDir, phase, start are defined in game.js (loaded after this file)
+const canvas = document.getElementById('game');
+let touchStartX = 0;
+let touchStartY = 0;
 
-// ── Keyboard ──────────────────────────────────────────────────────────────
-
-var KEY_MAP = { 37: 'left', 38: 'up', 39: 'right', 40: 'down' };
-
-document.addEventListener('keydown', function(e) {
-  var action = KEY_MAP[e.keyCode];
-  if (!action) return;
+canvas.addEventListener('touchstart', e => {
   e.preventDefault();
-
-  if (phase !== 'running') { start(); return; }
-
-  if (action === 'left'  && dir.x === 0) nextDir = { x: -1, y:  0 };
-  if (action === 'right' && dir.x === 0) nextDir = { x:  1, y:  0 };
-  if (action === 'up'    && dir.y === 0) nextDir = { x:  0, y: -1 };
-  if (action === 'down'  && dir.y === 0) nextDir = { x:  0, y:  1 };
-});
-
-// ── Touch / swipe ─────────────────────────────────────────────────────────
-
-var touchStart = null;
-
-canvas.addEventListener('touchstart', function(e) {
-  e.preventDefault();
-  var t = e.touches[0];
-  touchStart = { x: t.clientX, y: t.clientY };
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  if (phase === 'idle') start(); // tap sekali buat mulai
 }, { passive: false });
 
-canvas.addEventListener('touchend', function(e) {
+canvas.addEventListener('touchmove', e => {
   e.preventDefault();
-  if (!touchStart) return;
+  if (phase!== 'running') return;
 
-  var t  = e.changedTouches[0];
-  var dx = t.clientX - touchStart.x;
-  var dy = t.clientY - touchStart.y;
-  touchStart = null;
-
-  if (phase !== 'running') { start(); return; }
-
-  // Ignore taps — require a real swipe
-  if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+  let dx = e.touches[0].clientX - touchStartX;
+  let dy = e.touches[0].clientY - touchStartY;
 
   if (Math.abs(dx) > Math.abs(dy)) {
-    if (dx > 0 && dir.x === 0) nextDir = { x:  1, y: 0 };
-    if (dx < 0 && dir.x === 0) nextDir = { x: -1, y: 0 };
+    // swipe kiri-kanan
+    if (dx > 20) nextDir = {x: 1, y: 0}; // kanan
+    if (dx < -20) nextDir = {x: -1, y: 0}; // kiri
   } else {
-    if (dy > 0 && dir.y === 0) nextDir = { x: 0, y:  1 };
-    if (dy < 0 && dir.y === 0) nextDir = { x: 0, y: -1 };
+    // swipe atas-bawah
+    if (dy > 20) nextDir = {x: 0, y: 1}; // bawah
+    if (dy < -20) nextDir = {x: 0, y: -1}; // atas
   }
+
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
 }, { passive: false });
